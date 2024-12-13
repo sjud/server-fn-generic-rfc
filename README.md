@@ -495,3 +495,56 @@ spawn(async move(generic_fn(String::from("Hello, world.")).await.unwrap();));
 But when you want to start talking about the ssr/hydrate divide from your frontend type model then we now need to think about the addtional types. Which type is ssr only, what traits are ssr only etc. 
 
 This doesn't change any other code and has no breaking changes. # server-fn-generic-rfc
+
+
+# Problems
+
+This might work for the first server function, but the problem with creating types based on trait bounds (besides that is looks weird and is unintuitive) is that it doesn't work past 1 generic function. It breaks in the following situation
+
+```rust
+#[server(register<BackendType>)]
+pub async fn generic_fn_1<T:BackendTrait + SsrOnlyType + SsrOnlyTrait>() -> Result<(),ServerFnError> {}
+#[server(register<BackendTrait>)]
+pub async fn generic_fn_2<T:BackendTrait + SsrOnlyType + SsrOnlyTrait>() -> Result<(),ServerFnError> {}
+```
+
+So alternatively we could have a macro that defines all of the phantom types, trait constraint traits and shims.
+
+```rust
+server_fn_backend_shims!(
+    types = [BackendType,BackendType2],
+    traits = [BackendTrait],
+    impl = [BackendType:BackendTrait,BackendType2:BackendTrait],
+)
+```
+
+which would generate
+
+```rust
+
+pub struct BackendTypePhantom;
+pub struct BackendType2Phantom;
+pub trait BackendTraitConstraint{}
+impl BackendTraitConstraint for BackendTypePhantom{}
+impl BackendTraitConstraint for BackendType2Phantom{}
+#[cfg(feature="ssr")]
+impl ServerType for BackendTypePhantom{
+    type = BackendType;
+}
+#[cfg(feature="ssr")]
+impl ServerType for BackendTypePhantom{
+    type = BackendType2;
+}
+```
+and in our server function we could register the phantom that we use in our frontend code
+
+```rust
+#[server(register<BackendTypePhantom>,register<BackendType2Phantom>)]
+pub async fn generic_fn_1<T:BackendTrait>() -> Result<(),ServerFnError> {}
+#[server(register<BackendTypePhantom>,register<BackendType2Phantom>)]
+pub async fn generic_fn_2<T:BackendTrait>() -> Result<(),ServerFnError> {}
+```
+
+Because we don't actually use the real version in our ServerFn, both implementations (server and hydrate versions) use the Phantom. And when we do need to use the real version on the server we can call it through via `<T as ServerType>::ServerType` which is how we are using it now.
+
+And then nothing would change in our frontend code, we'd still write frontend code Generic over `BackendTraitConstraint` and use `BackendTypePhantom` type of types.
