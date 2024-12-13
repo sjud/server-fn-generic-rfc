@@ -1,0 +1,123 @@
+cfg_if::cfg_if! {
+    if #[cfg(feature="hydrate")] {
+        impl ServerFn for GenericServerFnGenericSsrOnly<SsrOnlyStruct3Phantom,SsrOnlyStruct4Phantom,i8,i16>  {
+            const PATH: &'static str = const_format::concatcp!("/api/generic_server_fn_generic_ssr_only",
+            stringify!(SsrOnlyStruct3Phantom),stringify!(SsrOnlyStruct4Phantom),stringify!(i8),stringify!(i16));
+
+            type Client = ::leptos::server_fn::client::browser::BrowserClient;
+            type ServerRequest = ::leptos::server_fn::request::BrowserMockReq;
+            type ServerResponse = ::leptos::server_fn::response::BrowserMockRes;
+            type Output = ();
+            type InputEncoding = ::leptos::server_fn::codec::PostUrl;
+            type OutputEncoding = ::leptos::server_fn::codec::Json;
+            type Error = ::leptos::server_fn::error::NoCustomError;
+            fn middlewares() -> Vec<
+                std::sync::Arc<
+                    dyn ::leptos::server_fn::middleware::Layer<
+                        ::leptos::server_fn::request::BrowserMockReq,
+                        ::leptos::server_fn::response::BrowserMockRes,
+                    >,
+                >,
+            > {
+                Vec::new()
+            }
+
+            #[allow(unused_variables)]
+            async fn run_body(self) -> Result<(), ServerFnError> {
+                panic!("internal error: entered unreachable code")
+            }
+        }
+    } else {
+
+        impl ServerFn for GenericServerFnGenericSsrOnly<SsrOnlyStruct3Phantom,SsrOnlyStruct4Phantom,i8,i16>  {
+
+ const PATH: &'static str = const_format::concatcp!("/api/generic_server_fn_generic_ssr_only",
+            stringify!(SsrOnlyStruct3Phantom),stringify!(SsrOnlyStruct4Phantom),stringify!(i8),stringify!(i16));
+
+            type Client = ::leptos::server_fn::client::browser::BrowserClient;
+            type ServerRequest =
+                ::leptos::server_fn::http_export::Request<::leptos::server_fn::axum_export::body::Body>;
+            type ServerResponse =
+                ::leptos::server_fn::http_export::Response<::leptos::server_fn::axum_export::body::Body>;
+            type Output = ();
+            type InputEncoding = ::leptos::server_fn::codec::PostUrl;
+            type OutputEncoding = ::leptos::server_fn::codec::Json;
+            type Error = ::leptos::server_fn::error::NoCustomError;
+            fn middlewares() -> Vec<
+                std::sync::Arc<
+                    dyn ::leptos::server_fn::middleware::Layer<
+                        ::leptos::server_fn::http_export::Request<
+                            ::leptos::server_fn::axum_export::body::Body,
+                        >,
+                        ::leptos::server_fn::http_export::Response<
+                            ::leptos::server_fn::axum_export::body::Body,
+                        >,
+                    >,
+                >,
+            > {
+                Vec::new()
+            }
+
+            #[allow(clippy::manual_async_fn)]
+            fn run_body(self) -> impl std::future::Future<Output = Result<(), ServerFnError>> + Send {
+                async move {
+                    let GenericServerFnGenericSsrOnly<SsrOnlyStruct3Phantom,SsrOnlyStruct4Phantom,i8,i16> { _marker,shared_type,shared_type_2 } = self;
+                    __generic_server_fn_generic_ssr_only::<<SsrOnlyStruct3Phantom as ServerType>::ServerType,<SsrOnlyStruct4Phantom as ServerType>::ServerType
+                    ,i8,i16>(shared_type,shared_type_2).await
+                }
+            }
+        }
+
+    }
+}
+
+#[cfg(feature = "ssr")]
+const _: () = {
+    static __INVENTORY: ::inventory::Node = ::inventory::Node {
+        value: &{
+            {
+                use ::leptos::server_fn::{codec::Encoding, ServerFn};
+                ::leptos::server_fn::ServerFnTraitObj::new(
+                    <GenericServerFnGenericSsrOnly<
+                        SsrOnlyStruct3Phantom,
+                        SsrOnlyStruct4Phantom,
+                        i8,
+                        i16,
+                    > as ServerFn>::PATH,
+                    <GenericServerFnGenericSsrOnly<
+                        SsrOnlyStruct3Phantom,
+                        SsrOnlyStruct4Phantom,
+                        i8,
+                        i16,
+                    > as ServerFn>::InputEncoding::METHOD,
+                    |req| {
+                        Box::pin(<GenericServerFnGenericSsrOnly<
+                            SsrOnlyStruct3Phantom,
+                            SsrOnlyStruct4Phantom,
+                            i8,
+                            i16,
+                        >>::run_on_server(req))
+                    },
+                    <GenericServerFnGenericSsrOnly<
+                        SsrOnlyStruct3Phantom,
+                        SsrOnlyStruct4Phantom,
+                        i8,
+                        i16,
+                    > as ServerFn>::middlewares,
+                )
+            }
+        },
+        next: ::inventory::core::cell::UnsafeCell::new(
+            ::inventory::core::option::Option::None,
+        ),
+    };
+    #[link_section = ".text.startup"]
+    unsafe extern "C" fn __ctor() {
+        unsafe {
+            ::inventory::ErasedNode::submit(__INVENTORY.value, &__INVENTORY)
+        }
+    }
+    #[used]
+    #[link_section = ".init_array"]
+    static __CTOR: unsafe extern "C" fn() = __ctor;
+};
